@@ -1,0 +1,24 @@
+# Generated: publishes the package when a tag v* is pushed. Do not edit, the next release replaces it.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - uses: actions/checkout@v4
+      - name: The tag is the version of the package
+        run: test "$GITHUB_REF_NAME" = "v1.1.1" || { echo "tag $GITHUB_REF_NAME, package v1.1.1"; exit 1; }
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - uses: rubygems/configure-rubygems-credentials@v2.1.0  # no major tag (v1, v2) in this repository
+      - run: gem build allymailer-rails.gemspec && gem push allymailer-rails-1.1.1.gem
